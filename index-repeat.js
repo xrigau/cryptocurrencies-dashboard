@@ -1,4 +1,5 @@
 const coinTicker = require('coin-ticker')
+const INTERVAL = 10000 // 60 * 60 * 1000
 const DATA_TO_LOAD = [
   {exchange: "poloniex", pair: "BTC_USD"},
   {exchange: "poloniex", pair: "ETH_USD"},
@@ -17,24 +18,13 @@ const gcs = require('@google-cloud/storage')({
 const storeInGcs = require('./store-gcs')(config, gcs)
 
 refresh = (exchange, pair) => coinTicker(exchange, pair)
+repeat = () => setTimeout(() => loadData(), INTERVAL)
 
 loadData = () => {
-  const promises = []
   for (i in DATA_TO_LOAD) {
-    const ex = DATA_TO_LOAD[i].exchange
-    const pair = DATA_TO_LOAD[i].pair
-    const p = refresh(ex, pair).then((result) => storeInGcs(result))
-    promises.push(p)
+    refresh(DATA_TO_LOAD[i].exchange, DATA_TO_LOAD[i].pair).then((result) => storeInGcs(result))
   }
-  return Promise.all(promises)
+  repeat()
 }
 
-/**
- * @param {!Object} req Cloud Function request context.
- * @param {!Object} res Cloud Function response context.
- */
-exports.loadCryptocurrencyData = function loadCryptocurrencyData(req, res) {
-  loadData()
-    .then(() => res.status(200).send('Success!'))
-    .catch((err) => res.status(400).send('Error saving data to GCS'))
-}
+loadData()
