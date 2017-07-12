@@ -1,0 +1,11 @@
+{
+  "GOOGLE_STORAGE": {
+    "PROJECT_ID": "project-id",
+    "BUCKET_NAME": "bucket-name",
+    "CREDENTIALS_FILE": "/path/to/google/credentials/file.json"
+  },
+  "GITHUB": {
+    "BUCKET_BASE_PATH": "base/path",
+    "HASH_PASSPHRASE": "some-passphrase"
+  }
+}
